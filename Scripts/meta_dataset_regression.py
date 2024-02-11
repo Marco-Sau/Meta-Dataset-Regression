@@ -2,6 +2,15 @@
 # # <span style="color:#756bb1">Data Mining Project: Regression Task on dataset Meta</span>
 
 # %% [markdown]
+# The project is divided into several phases:
+# 
+# 1. **Dataset Analysis**: Involves loading the dataset using scikit-learn's `fetch_openml` function and organizing the data into a pandas DataFrame. The first few rows should be displayed for an overview.
+# 
+# 2. **Preprocessing**: This step includes removing nominal features and handling missing values either by deletion or interpolation using pandas' `interpolate` method. Two datasets, D1 (with missing values removed) and D2 (with interpolated values), are created for further processing, including normalization or standardization.
+# 
+# 3. **Regression**: Involves splitting both datasets into training and test sets and applying various regression models (like Linear Regression, Logistic Regression, Support Vector, Decision Trees, Random Forest, Gradient Boosting) with default parameters. The results should be reported in terms of MAE, MAPE, and SMAPE, with appropriate graphs plotted for both datasets.
+
+# %% [markdown]
 # ## <span style="color:#e6550d">0. General Info</span>
 
 # %% [markdown]
@@ -18,7 +27,7 @@
 # - [Dataset Link](https://openml.org/search?type=data&id=566&sort=runs&status=active)
 # 
 # Cloud resources:
-# - [GitHub Repo](https://github.com/Marco-Sau/Data-Mining-Project)
+# - [GitHub Repo](https://github.com/Marco-Sau/Meta-Dataset-Regression)
 # 
 # Date:
 # - February 2024
@@ -294,8 +303,7 @@ df.shape
 # 
 
 # %% [markdown]
-# Overview of the target values.</br>
-# At first look there is a huge difference between the min and max value. Further investigation will be made during the process.
+# Overview of the target values.
 
 # %%
 # Target variable 
@@ -305,6 +313,28 @@ print(dataset.target, "\n")
 min_target = df['target'].min()
 max_target = df['target'].max()
 print(f"Min: {min_target}, Max: {max_target}")
+
+# %% [markdown]
+# Looking at the results, there is a huge difference between the min and max value. Later in the notebook we are going to plot the distribution of these values to get a deeper understanding of the target.
+
+# %% [markdown]
+# In the next section we investigate more deeply in the target variable regarding the number of unique values.<br>
+# 
+# **Observations**:
+# - The results shows that there are 55 duplicate target values, the total number of instances that have the same output of another are 436, and only 92 instances has a unique value. This result could be relevant in understanding the performance if it will be confirmed in the modified datasets.
+
+# %%
+# Count how many times a target values exist more then 1 time 
+total_instances = df.shape[0]
+unique_counts = df['target'].value_counts()
+filtered_counts = unique_counts[unique_counts > 1]
+
+# To display the results
+print(f"Number of unique target values:\n{len(filtered_counts)}")
+print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
+print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
+print(f"Target value and number of repetitions:\n{filtered_counts} ")
+
 
 # %% [markdown]
 # Extract the first rows of the dataset to have an overview of the data.
@@ -370,18 +400,10 @@ plot_relationships(df, 'target')
 # ## <span style="color:#e6550d">2. Pre-Processing</span>
 
 # %% [markdown]
-# ### <span style="color:#31a354">Dataset D1: Dataset Without Missing Values</span>
-
-# %% [markdown]
-# Delete data with missing values. (N.B. The dataset obtained is indicated from here on with D1)
+# ### <span style="color:#31a354">Original Dataset: Remove Categorical Variables</span>
 
 # %% [markdown]
 # First we remove the categorical variables.
-
-# %%
-# Identifying nominal features and removing them
-nominal_features = ['DS_Name', 'Alg_Name']
-df = df.drop(columns=nominal_features)
 
 # %% [markdown]
 # Check the actual shape after removing the categorical variables.
@@ -389,6 +411,11 @@ df = df.drop(columns=nominal_features)
 # %%
 # Print total number of rows and columns
 print(df.shape)
+
+# %%
+# Identifying nominal features and removing them
+nominal_features = ['DS_Name', 'Alg_Name']
+df = df.drop(columns=nominal_features)
 
 # %% [markdown]
 # Check for missing values through the variables, and count the number of them for each variable.</br>
@@ -452,6 +479,12 @@ print(df[df['fract2'].isnull()])
 # %% [markdown]
 # Identifying and handling missing values by removing rows with missing values and storing the result in the dataset D1.
 
+# %% [markdown]
+# ### <span style="color:#31a354">Dataset D1: Dataset Without Missing Values</span>
+
+# %% [markdown]
+# Delete data with missing values. (N.B. The dataset obtained is indicated from here on with D1)
+
 # %%
 # Dataset without missing values
 D1 = df.dropna()
@@ -481,6 +514,25 @@ D1.shape
 # 
 # 3. **Consistency Across Variables**:
 #    - Some variables like 'cancor1' and 'cancor2' show a high level of consistency between the two sets, with similar distributions. This suggests that the relationship between these variables and the target might be stable across the two datasets.
+
+# %% [markdown]
+# In the next section we investigate more deeply in the target variable regarding the number of unique values in dataset D1.<br>
+# 
+# **Observations**:
+# - The results shows that there are 22 duplicate target values, the total number of instances that have the same output of another are 231, and only 33 instances has a unique value. 
+
+# %%
+# Count how many times a target values exist more then 1 time 
+total_instances = D1.shape[0]
+unique_counts = D1['target'].value_counts()
+filtered_counts = unique_counts[unique_counts > 1]
+
+# To display the results
+print(f"Number of unique target values:\n{len(filtered_counts)}")
+print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
+print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
+print(f"Target value and number of repetitions:\n{filtered_counts} ")
+
 
 # %% [markdown]
 # (Optional) Plot the distribution of the data of the dataset D1
@@ -526,6 +578,25 @@ D2.info()
 
 # %%
 D2.shape
+
+# %% [markdown]
+# In the next section we investigate more deeply in the target variable regarding the number of unique values in dataset D2.<br>
+# 
+# **Observations**:
+# - The results shows that there are 55 duplicate target values, the total number of instances that have the same output of another are 436, and only 92 instances has a unique value. 
+
+# %%
+# Count how many times a target values exist more then 1 time 
+total_instances = D2.shape[0]
+unique_counts = D2['target'].value_counts()
+filtered_counts = unique_counts[unique_counts > 1]
+
+# To display the results
+print(f"Number of unique target values:\n{len(filtered_counts)}")
+print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
+print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
+print(f"Target value and number of repetitions:\n{filtered_counts} ")
+
 
 # %% [markdown]
 # Check for missing values in dataset D2.<br>
@@ -616,6 +687,24 @@ if extra_plots: plot_numeric_distributions(D2)
 # %%
 # Standardize D1 and D2
 D1_standardized, D2_standardized = standardize_datasets(D1, D2)
+
+# %% [markdown]
+# Comparison of the original and standardized datasets.
+
+# %%
+# Compare basic statistics
+stats_comparison = pd.DataFrame({
+    'Mean Before': df.mean(),
+    'Mean After': D2_standardized.mean(),
+    'Std Dev Before': df.std(),
+    'Std Dev After': D2_standardized.std()
+})
+
+print(stats_comparison)
+
+
+# %%
+
 
 # %% [markdown]
 # (Optional) Plot the distribution of the data D1 after standardization.
@@ -754,6 +843,72 @@ print(results_df_d2)
 # - **Random Forest** and **Gradient Boosting** both have increased MAE and MAPE but maintain a relatively stable SMAPE, demonstrating their robustness to interpolated data.
 
 # %% [markdown]
+# To better understand the results we conducted an investigation on feature importance.
+
+# %% [markdown]
+# **Understanding Feature Importance**
+# 
+# **Introduction**
+# Feature importance refers to the techniques for assigning scores to input features based on how useful they are at predicting a target variable. Understanding feature importance can lead to insights into the dataset and the model's behavior. For example Knowing which features are less important can lead to model simplification by removing these features. This can reduce model complexity, improve generalization, and decrease overfitting. By the fact we have different datasets, we can analysis how the features can influence the same model based on the size and type of the data.
+# 
+# **Methods for Determining Feature Importance**
+# Different models have different methods for calculating feature importance:
+# - **Coefficients in Linear Models**: In linear models (like Linear Regression), the coefficients can be used to represent the importance of features. The size and sign of the coefficients indicate the extent and direction of the impact on the target variable.
+# 
+# - **Tree-based Models**: Models like Decision Trees, Random Forests, and Gradient Boosting Machines have a built-in `feature_importances_` attribute.
+
+# %%
+regressors = [
+    LinearRegression(),
+    SVR(kernel='linear'),  # Ensure linear kernel for feature interpretation
+    DecisionTreeRegressor(),
+    RandomForestRegressor(),
+    GradientBoostingRegressor()
+]
+
+datasets = [
+    (X_train_d1, y_train_d1, 'D1'),
+    (X_train_d2, y_train_d2, 'D2')
+]
+
+# Create a figure with subplots - 2 columns for each dataset and rows for each model
+n_models = len(regressors)
+fig, axes = plt.subplots(n_models, 2, figsize=(15, 5 * n_models))  # Adjust figsize as needed
+
+for i, regressor in enumerate(regressors):
+    for j, (X_train, y_train, dataset_name) in enumerate(datasets):
+        regressor.fit(X_train, y_train)
+
+        # Check if the model has 'feature_importances_'
+        if hasattr(regressor, 'feature_importances_'):
+            importances = regressor.feature_importances_
+        # For models without 'feature_importances_', use 'coef_' (for linear models)
+        elif hasattr(regressor, 'coef_'):
+            # Take absolute value of coefficients for importance
+            importances = np.abs(regressor.coef_)
+            if len(importances.shape) > 1:  # Handling the case where coef_ returns a 2D array
+                importances = importances[0]
+
+        # Create a series of feature importances
+        feature_names = X_train.columns
+        feature_importances = pd.Series(importances, index=feature_names).sort_values(ascending=False)
+
+        # Plot on the corresponding subplot
+        ax = axes[i, j]
+        feature_importances.plot(kind='bar', ax=ax)
+        ax.set_title(f'Feature Importance for {type(regressor).__name__} on {dataset_name}')
+        ax.tick_params(axis='x', rotation=90)  # Rotate x-axis labels for readability
+
+plt.tight_layout()
+plt.show()
+
+
+# %% [markdown]
+# **Feature Importance Analysis**
+# 
+# As for Linear Regression, the kurtois is the main feature on both datasets along with N. The latter, however, is a bit important on interpolated data. With SVR, the importance of attributes changes dramatically from one dataset to another. In decision trees, N dominates when we don’t introduce noise, while in interpolated, cancor2 data it is dominant. To consider in this case that cancor2 is one of the variables that has been interpolated. The same scenario is also found with Random Forest and Gradient Boosting, which have the same structure as the Decision Tree. Linear Regression is the one that uses the most attributes to make decisions, followed by SVR. The other models base their decisions on a few variables. Overall N, is the attribute that on average influences the decisions of models the most.
+
+# %% [markdown]
 # ### <span style="color:#31a354">Plots</span>
 
 # %% [markdown]
@@ -805,42 +960,42 @@ else:
 # ## <span style="color:#e6550d">4. Conclusions</span>
 
 # %% [markdown]
-# ## Comprehensive Analysis of Regression Model Performance
+# **Comprehensive Analysis of Regression Model Performance**
 # 
-# ### Data Understanding and Preprocessing
+# **Data Understanding and Preprocessing**
 # - The dataset contains a 'target' variable of interest, with 'correl', 'cancor1', and 'fract2' having missing values.
 # - 'DS_Name' and 'Alg_Name' are categorical variables, and they were excluded from the analysis.
 # 
-# ### Datasets Overview
+# **Datasets Overview**
 # - **D1**: Missing values were handled by deletion. This may have reduced the dataset's size and potentially impacted representativeness and model performance.
 # - **D2**: Missing values were interpolated, aiming to preserve information but potentially introducing noise or bias into the dataset.
 # 
-# ### Model Evaluation
+# **Model Evaluation**
 # - Models were assessed using MAE, MAPE, and SMAPE, with visual comparisons illustrating their performance on D1 and D2.
 # 
-# ### Metrics Interpretation
+# **Metrics Interpretation**
 # - **MAE** shows average absolute errors; lower values are better.
 # - **MAPE** gives errors as a percentage, where lower is better.
 # - **SMAPE** accounts for symmetry in errors, with lower values indicating better predictions.
 # 
-# ### Modeling Insights
+# **Modeling Insights**
 # - **D1**: Clean dataset with missing values handled by deletion.
 #   - **Support Vector Machine** performs best in MAE and MAPE, suggesting accuracy with smaller datasets.
 # - **D2**: Larger dataset with interpolated missing values.
 #   - **Gradient Boosting** shows the best MAE, indicating effectiveness in managing absolute errors even with interpolated data.
 #   - **Decision Trees** perform well in terms of SMAPE, showcasing their strength in managing relative errors effectively.
 # 
-# ### Overall Assessment
+# **Overall Assessment**
 # - **Gradient Boosting** and **Random Forest** demonstrate resilience and robustness across both datasets.
 # - Data preprocessing, such as handling missing values through interpolation or deletion, significantly influences model performance.
 # - Feature engineering, hyperparameter tuning, and ensemble methods could further enhance model effectiveness.
 # 
-# ### Recommendations for Practice
+# **Recommendations for Practice**
 # - Select **Support Vector Machine** for smaller, cleaner datasets (D1) for its lower MAE and MAPE.
 # - Consider **Gradient Boosting** or **Decision Trees** for larger datasets with interpolated values (D2), focusing on the balance between MAE, MAPE, and SMAPE.
 # - Employ cross-validation and other validation techniques for a comprehensive model evaluation.
 # 
-# ### Future Directions
+# **Future Directions**
 # - Investigate the impact of different interpolation methods on D2's data quality.
 # - Explore additional validation methods for a thorough assessment of model stability and generalizability.
 # 
