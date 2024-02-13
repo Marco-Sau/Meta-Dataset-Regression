@@ -1,14 +1,5 @@
 # %% [markdown]
-# # <span style="color:#756bb1">Data Mining Project: Regression Task on dataset Meta</span>
-
-# %% [markdown]
-# The project is divided into several phases:
-# 
-# 1. **Dataset Analysis**: Involves loading the dataset using scikit-learn's `fetch_openml` function and organizing the data into a pandas DataFrame. The first few rows should be displayed for an overview.
-# 
-# 2. **Preprocessing**: This step includes removing nominal features and handling missing values either by deletion or interpolation using pandas' `interpolate` method. Two datasets, D1 (with missing values removed) and D2 (with interpolated values), are created for further processing, including normalization or standardization.
-# 
-# 3. **Regression**: Involves splitting both datasets into training and test sets and applying various regression models (like Linear Regression, Logistic Regression, Support Vector, Decision Trees, Random Forest, Gradient Boosting) with default parameters. The results should be reported in terms of MAE, MAPE, and SMAPE, with appropriate graphs plotted for both datasets.
+# # <span style="color:#756bb1">Data Mining Project: Regression Task on dataset 'Meta'</span>
 
 # %% [markdown]
 # ## <span style="color:#e6550d">0. General Info</span>
@@ -31,6 +22,14 @@
 # 
 # Date:
 # - February 2024
+# 
+# Project Overview:
+# 
+# 1. **Dataset Analysis**: Involves loading the dataset using scikit-learn's `fetch_openml` function and organizing the data into a pandas DataFrame. The first few rows should be displayed for an overview.
+# 
+# 2. **Preprocessing**: This step includes removing nominal features and handling missing values either by deletion or interpolation using pandas' `interpolate` method. Two datasets, D1 (with missing values removed) and D2 (with interpolated values), are created for further processing, including normalization or standardization.
+# 
+# 3. **Regression**: Involves splitting both datasets into training and test sets and applying various regression models (like Linear Regression, Logistic Regression, Support Vector, Decision Trees, Random Forest, Gradient Boosting) with default parameters. The results should be reported in terms of MAE, MAPE, and SMAPE, with appropriate graphs plotted for both datasets.
 
 # %% [markdown]
 # ## <span style="color:#e6550d">1. Dataset Analysis</span>
@@ -79,7 +78,7 @@ np.random.seed(42)
 # In this section there are the functions used to answer the research questions.
 
 # %% [markdown]
-# The SMAPE function is used in the course.
+# The SMAPE function used in the course.
 # 
 # ![smape function.png](<attachment:smape function.png>)
 
@@ -239,6 +238,43 @@ def normalize_datasets(D1, D2):
     return D1_normalized, D2_normalized
 
 # %% [markdown]
+# Function to find the number of duplicated target values
+
+# %%
+def target_values(dataset):
+    """
+    Analyzes the 'target' column in a given dataset to determine the number of unique 
+    and duplicate target values across instances.
+
+    The function computes the total number of instances in the dataset, counts the 
+    occurrences of each unique target value, filters out target values that occur only 
+    once, and then prints out a summary including the total instances, the number of 
+    duplicate target values, the number of instances with a unique target value, and 
+    the number of instances that share a target value with another instance.
+
+    Parameters:
+    - dataset (DataFrame): A pandas DataFrame containing a 'target' column.
+
+    Outputs:
+    The function prints the following information:
+    - Total number of instances in the dataset.
+    - Number of unique target values that occur more than once.
+    - Number of instances with a unique target value.
+    - Number of instances that share the same target value.
+    - A series object displaying target values with their corresponding counts, filtered to only include counts greater than 1.
+    """
+    total_instances = dataset.shape[0]
+    unique_counts = dataset['target'].value_counts()
+    filtered_counts = unique_counts[unique_counts > 1]
+
+    # To display the results
+    print("Total instances:", "\n", total_instances)
+    print(f"Number of duplicate target values:\n {len(filtered_counts)}")
+    print(f"Number of instances with a unique target value:\n {total_instances - sum(filtered_counts)}")
+    print(f"Number of instances that have the same target value than another:\n {sum(filtered_counts)}")
+    print("Instances with duplicate target values","\n", filtered_counts)
+
+# %% [markdown]
 # ### <span style="color:#31a354">The Meta Dataset</span>
 
 # %% [markdown]
@@ -325,15 +361,7 @@ print(f"Min: {min_target}, Max: {max_target}")
 
 # %%
 # Count how many times a target values exist more then 1 time 
-total_instances = df.shape[0]
-unique_counts = df['target'].value_counts()
-filtered_counts = unique_counts[unique_counts > 1]
-
-# To display the results
-print(f"Number of unique target values:\n{len(filtered_counts)}")
-print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
-print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
-print(f"Target value and number of repetitions:\n{filtered_counts} ")
+target_values(df)
 
 
 # %% [markdown]
@@ -523,16 +551,7 @@ D1.shape
 
 # %%
 # Count how many times a target values exist more then 1 time 
-total_instances = D1.shape[0]
-unique_counts = D1['target'].value_counts()
-filtered_counts = unique_counts[unique_counts > 1]
-
-# To display the results
-print(f"Number of unique target values:\n{len(filtered_counts)}")
-print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
-print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
-print(f"Target value and number of repetitions:\n{filtered_counts} ")
-
+target_values(D1)
 
 # %% [markdown]
 # (Optional) Plot the distribution of the data of the dataset D1
@@ -587,15 +606,7 @@ D2.shape
 
 # %%
 # Count how many times a target values exist more then 1 time 
-total_instances = D2.shape[0]
-unique_counts = D2['target'].value_counts()
-filtered_counts = unique_counts[unique_counts > 1]
-
-# To display the results
-print(f"Number of unique target values:\n{len(filtered_counts)}")
-print(f"Number of instances that have the same target value than another:\n{len(unique_counts)}")
-print(f"Number of instances with a unique target value:\n{total_instances - len(unique_counts)}")
-print(f"Target value and number of repetitions:\n{filtered_counts} ")
+target_values(D2)
 
 
 # %% [markdown]
@@ -689,7 +700,8 @@ if extra_plots: plot_numeric_distributions(D2)
 D1_standardized, D2_standardized = standardize_datasets(D1, D2)
 
 # %% [markdown]
-# Comparison of the original and standardized datasets.
+# Comparison of the original and standardized datasets.<br>
+# Numeric comparison.
 
 # %%
 # Compare basic statistics
@@ -703,8 +715,42 @@ stats_comparison = pd.DataFrame({
 print(stats_comparison)
 
 
-# %%
+# %% [markdown]
+# Graphical comparison using boxplot representation.
 
+# %%
+# Comparison of the original and standardized data
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+D2_standardized2 = (df[numeric_cols] - df[numeric_cols].mean()) / df[numeric_cols].std()
+
+# Visual comparison with boxplots
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 7))
+
+# Boxplot for original data
+df[numeric_cols].plot(kind='box', ax=axes[0], title='Original Data', rot=45)
+
+# Boxplot for standardized data
+D2_standardized2.plot(kind='box', ax=axes[1], title='Standardized Data', rot=45)
+
+plt.tight_layout()
+plt.show()
+
+
+# %% [markdown]
+# **Observations:**
+# The comparison between the original and standardized data in these boxplots allows us to draw several conclusions:
+# 
+# 1. **Scale Difference**: The original data has variables on different scales, which is evident by the wide range of values on the y-axis. After standardization, all variables are on the same scale, with a mean of 0 and standard deviation of 1. This is useful for algorithms that are sensitive to the scale of data.
+# 
+# 2. **Outliers**: The presence of outliers is more evident in the standardized data. While they were also present in the original data, standardization makes them stand out more relative to the central tendency and spread of the data.
+# 
+# 3. **Variable Comparison**: Standardization allows for the direct comparison of variability across variables. In the original data, some variables with larger scales may appear to have more variability, but after standardization, it's clear that some variables with smaller scales actually have a comparable level of variability.
+# 
+# 4. **Distribution Shape**: The shape of the data distribution for each variable is preserved after standardization. If a variable has a skewed distribution in the original data, it will remain skewed after standardization.
+# 
+# 5. **Utility for Machine Learning**: Standardized data is ready for use in algorithms such as Support Vector Machines, which assume that all features are centered around zero and have variance in the same order.
+# 
+# 6. **Data Transformation**: The standardized data plot does not have units on the y-axis because standardization removes the original units, transforming the data into dimensionless z-scores.
 
 # %% [markdown]
 # (Optional) Plot the distribution of the data D1 after standardization.
@@ -837,10 +883,10 @@ print(results_df_d2)
 # - **Decision Trees** and **Gradient Boosting** share the exact MAE and very close MAPE values, but both have the lowest SMAPE, indicating effective handling of symmetrical errors.
 # 
 # **Observations on D2**:
-# - **Linear Regression** shows an increase in all error metrics compared to D1, possibly struggling with the larger dataset size and interpolated values.
+# - **Linear Regression** shows an increase in MAE e SMAPE compared to D1, possibly struggling with the larger dataset size and interpolated values.
 # - **Support Vector** has a notably higher SMAPE on D2, indicating challenges with the interpolation and a potential increase in both overestimations and underestimations.
 # - **Decision Trees** show an improvement in MAPE, suggesting that the model is less sensitive to the increased dataset size and interpolated values.
-# - **Random Forest** and **Gradient Boosting** both have increased MAE and MAPE but maintain a relatively stable SMAPE, demonstrating their robustness to interpolated data.
+# - **Random Forest** and **Gradient Boosting** both have increased MAE, decreased MAPE, and maintain a relatively stable SMAPE, demonstrating their robustness to interpolated data.
 
 # %% [markdown]
 # To better understand the results we conducted an investigation on feature importance.
@@ -957,10 +1003,10 @@ else:
     plot_line_chart(results_d1, results_d2, 'Performance on Dataset D1', 'Performance on Dataset D2')
 
 # %% [markdown]
-# ## <span style="color:#e6550d">4. Conclusions</span>
+# ## <span style="color:#e6550d">4. Summary</span>
 
 # %% [markdown]
-# **Comprehensive Analysis of Regression Model Performance**
+# **Comprehensive Analysis**
 # 
 # **Data Understanding and Preprocessing**
 # - The dataset contains a 'target' variable of interest, with 'correl', 'cancor1', and 'fract2' having missing values.
@@ -986,26 +1032,16 @@ else:
 #   - **Decision Trees** perform well in terms of SMAPE, showcasing their strength in managing relative errors effectively.
 # 
 # **Overall Assessment**
-# - **Gradient Boosting** and **Random Forest** demonstrate resilience and robustness across both datasets.
+# - **Gradient Boosting** and **Decision Trees** demonstrate resilience and robustness across both datasets.
 # - Data preprocessing, such as handling missing values through interpolation or deletion, significantly influences model performance.
 # - Feature engineering, hyperparameter tuning, and ensemble methods could further enhance model effectiveness.
-# 
-# **Recommendations for Practice**
-# - Select **Support Vector Machine** for smaller, cleaner datasets (D1) for its lower MAE and MAPE.
-# - Consider **Gradient Boosting** or **Decision Trees** for larger datasets with interpolated values (D2), focusing on the balance between MAE, MAPE, and SMAPE.
-# - Employ cross-validation and other validation techniques for a comprehensive model evaluation.
-# 
-# **Future Directions**
-# - Investigate the impact of different interpolation methods on D2's data quality.
-# - Explore additional validation methods for a thorough assessment of model stability and generalizability.
 # 
 
 # %% [markdown]
 # ## <span style="color:#e6550d">5. Optional Test with Normalization</span>
 
 # %% [markdown]
-# 
-# <span style="color:red">*This is just a test conducted to underline the fact that the standardization is the best technique to train our models on our dataset. It's not mandatory.*</span>
+# #### <span style="color:red">*This is just a test conducted to underline the fact that the standardization is the right technique to use to train our models on our dataset. It's not mandatory.*</span>
 
 # %% [markdown]
 # ### <span style="color:#31a354">Normalizing the data</span>
@@ -1064,6 +1100,5 @@ if normalize_test:
         plot_line_chart_extra(results_d1, results_d2, 'Performance on Dataset D1', 'Performance on Dataset D2')
     else:
         plot_line_chart(results_d1, results_d2, 'Performance on Dataset D1', 'Performance on Dataset D2')
-
 
 
