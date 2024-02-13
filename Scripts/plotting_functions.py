@@ -1,3 +1,25 @@
+"""
+Author: Marco Sau
+Date: February 2024
+
+This script contains functions for visualizing data, particularly focusing on the distributions of numeric variables in datasets. 
+It leverages libraries like numpy, seaborn, and matplotlib to create insightful and aesthetically pleasing visualizations. 
+
+Functions:
+1. plot_numeric_distributions
+2. plot_relationships
+3. plot_original_vs_interpolated
+4. plot_bar_chart_model
+5. plot_bar_chart_model_extra
+6. plot_bar_chart_metric
+7. plot_bar_chart_metric_extra
+8. plot_line_chart
+9. plot_line_chart_extra
+
+Each function is designed to provide a clear and insightful visual representation of different types of data and metrics.
+"""
+
+
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
